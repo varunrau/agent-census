@@ -1,0 +1,42 @@
+{
+  "name": "agent-census",
+  "version": "0.1.0",
+  "description": "📊 AI agent observability — trace sessions, tokens, and outcomes. The only tool that tracks what your agents actually built.",
+  "type": "module",
+  "bin": {
+    "agent-census": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test dist/**/*.test.js"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "claude-code",
+    "codex",
+    "token-usage",
+    "observability",
+    "outcome-tracking",
+    "developer-tools"
+  ],
+  "author": "Varun Rau <varunrau@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/varunrau/agent-census.git"
+  },
+  "homepage": "https://github.com/varunrau/agent-census",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.0"
+  }
+}
