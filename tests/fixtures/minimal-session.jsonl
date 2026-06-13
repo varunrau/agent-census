@@ -1,0 +1,2 @@
+{"type":"system","timestamp":"2026-06-12T14:00:00Z","model":"claude-3-haiku"}
+{"type":"assistant","timestamp":"2026-06-12T14:01:00Z","model":"claude-3-haiku","usage":{"input_tokens":100,"output_tokens":50}}
