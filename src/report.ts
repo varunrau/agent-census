@@ -1,5 +1,5 @@
 /**
- * Report formatter — renders session data as terminal output or JSON.
+ * Report formatter — renders session data as terminal output, JSON, or CSV.
  *
  * Follows the AgentCensus design principle: "efficiency is the visual language."
  * Dense, scannable, no noise. Every number is meaningful.
@@ -330,6 +330,62 @@ export function formatOutcomeReport(
 
   lines.push("");
   return lines.join("\n");
+}
+
+/**
+ * Format sessions as CSV for spreadsheet consumption.
+ *
+ * Columns: id, agent, project, start_time, end_time, duration_min,
+ *          model, tokens_in, tokens_out, cost_estimate, files_changed,
+ *          outcomes
+ */
+export function formatCsv(sessions: Session[]): string {
+  const header = [
+    "id",
+    "agent",
+    "project",
+    "start_time",
+    "end_time",
+    "duration_min",
+    "model",
+    "tokens_in",
+    "tokens_out",
+    "cost_estimate",
+    "files_changed",
+    "outcomes",
+  ].join(",");
+
+  const rows = sessions.map((s) => {
+    const cols = [
+      csvEscape(s.id),
+      s.agent,
+      csvEscape(s.project),
+      s.startTime.toISOString(),
+      s.endTime?.toISOString() ?? "",
+      (s.durationMs / 60000).toFixed(1),
+      s.model,
+      s.tokensIn,
+      s.tokensOut,
+      s.costEstimate.toFixed(4),
+      s.filesChanged.length,
+      csvEscape(s.outcomes.join("; ")),
+    ];
+    return cols.join(",");
+  });
+
+  return [header, ...rows].join("\n") + "\n";
+}
+
+/** Escape a CSV field — wrap in quotes if it contains commas, quotes, or newlines. */
+function csvEscape(value: string): string {
+  if (
+    value.includes(",") ||
+    value.includes('"') ||
+    value.includes("\n")
+  ) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
 }
 
 /**

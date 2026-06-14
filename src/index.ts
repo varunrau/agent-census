@@ -18,7 +18,7 @@ import { parseArgs } from "node:util";
 import { scanSessions } from "./scanner.js";
 import { classifyOutcomes } from "./outcomes.js";
 import { calculateCosts } from "./costs.js";
-import { formatReport, formatJson, formatOutcomeReport } from "./report.js";
+import { formatReport, formatJson, formatCsv, formatOutcomeReport } from "./report.js";
 
 const VERSION = "0.1.0";
 
@@ -129,6 +129,8 @@ async function main(): Promise<void> {
     // Format output
     if (values.json) {
       console.log(formatJson({ sessions, costs, outcomes }));
+    } else if (values.csv) {
+      process.stdout.write(formatCsv(sessions));
     } else {
       switch (command) {
         case "outcomes":
