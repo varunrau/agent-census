@@ -18,7 +18,7 @@
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/**/*.test.ts"
+    "test": "tsx --test tests/costs.test.ts tests/outcomes.test.ts tests/report.test.ts"
   },
   "keywords": [
     "ai",
