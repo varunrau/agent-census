@@ -43,11 +43,15 @@ You're spending $50-500+/week on AI coding agents. You know the token count. **B
 ## Install
 
 ```bash
-# No install needed — run directly
-npx agent-census
+# Install from GitHub (recommended — works right now)
+npm install -g github:varunrau/agent-census
+agent-census
 
-# Or install globally
-npm install -g agent-census
+# Or run directly from source
+git clone https://github.com/varunrau/agent-census.git
+cd agent-census && npm install && npm run build && npm start
+
+# Coming soon: npm install -g agent-census
 ```
 
 Requires Node.js 20+.
@@ -73,6 +77,9 @@ agent-census compare --days 7
 # JSON output (for scripts/dashboards)
 agent-census --json > report.json
 
+# CSV export (for spreadsheets)
+agent-census --csv > report.csv
+
 # Filter by agent
 agent-census --agent claude --days 7
 ```
@@ -94,7 +101,7 @@ agent-census --agent claude --days 7
 | `--project <name>` | `-p` | Filter by project name |
 | `--agent <name>` | `-a` | Filter by agent (claude, codex) |
 | `--json` | | JSON output |
-| `--csv` | | CSV output |
+| `--csv` | | CSV export (opens in Excel/Sheets) |
 | `--no-color` | | Disable terminal colors |
 
 ## Supported Agents
@@ -128,19 +135,21 @@ Future versions will support:
 - LLM-assisted classification
 - Team dashboards (SaaS)
 
-## Comparison
+## Comparison (updated June 15, 2026)
 
 | Tool | Stars | Type | Tokens | Costs | **Outcomes** |
-|------|-------|------|--------|-------|---------|
-| **AgentCensus** | new | CLI+JSON | ✅ | ✅ | **✅** |
-| tokscale | 3,689⭐ | Rust CLI+TUI+Web | ✅ | ✅ | ❌ |
-| Claude-Code-Usage-Monitor | 8,190⭐ | Python dashboard | ✅ | ✅ | ❌ |
-| claude-hud | 25,057⭐ | Claude Code plugin | ✅ | ❌ | ❌ |
-| CodexBar | 14,675⭐ | macOS menu bar | ✅ | ✅ | ❌ |
-| claude-devtools | 3,551⭐ | Electron app | ✅ | ✅ | ❌ |
-| TokenTracker (mm) | 682⭐ | macOS widgets | ✅ | ✅ | ❌ |
+|------|-------|------|--------|-------|---------:|
+| **AgentCensus** | new | CLI+JSON+CSV | ✅ | ✅ | **✅** |
+| claude-hud | 25,211⭐ | Claude Code plugin | ✅ | ❌ | ❌ |
+| tokscale | 3,733⭐ | Rust CLI+TUI+Web | ✅ | ✅ | ❌ |
+| claude-devtools | 3,567⭐ | Electron desktop | ✅ | ✅ | ❌ |
+| claude-usage | 1,826⭐ | Python dashboard | ✅ | ✅ | ❌ |
+| Clawdmeter | 1,623⭐ | ESP32 hardware | ✅ | ❌ | ❌ |
+| TokenTracker (mm) | 712⭐ | macOS widgets | ✅ | ✅ | ❌ |
+| ai-token-monitor | 240⭐ | macOS menu bar | ✅ | ✅ | ❌ |
+| splitrail | 198⭐ | Rust cross-platform | ✅ | ✅ | ❌ |
 
-Every competitor tracks *inputs* (tokens, cost, time). AgentCensus is the first to track *outputs* (files, features, bugs fixed, tests written).
+**30+ tools** track AI agent *inputs* (tokens, cost, time). AgentCensus is the **only one** that tracks *outputs* (files changed, features built, bugs fixed, tests written).
 
 ## Philosophy
 
@@ -162,6 +171,15 @@ npm run build
 npm start
 ```
 
+### Testing
+
+```bash
+# Run all 54 tests
+npm test
+```
+
+Tests cover cost calculation (14 tests), outcome classification (13 tests), and report formatting/CSV/JSON (27 tests). Uses Node.js built-in test runner — no extra dependencies.
+
 ### Project Structure
 
 ```
@@ -172,6 +190,11 @@ src/
 ├── costs.ts       # Token cost calculation
 ├── outcomes.ts    # Outcome classification (the differentiator)
 └── report.ts      # Terminal and JSON formatters
+
+tests/
+├── costs.test.ts     # 14 tests — model-specific pricing
+├── outcomes.test.ts  # 13 tests — classification engine
+└── report.test.ts    # 27 tests — formatting, CSV, JSON
 ```
 
 ## Roadmap
@@ -181,9 +204,10 @@ src/
 - [x] Outcome classification
 - [x] Terminal reports with color
 - [x] JSON output
+- [x] CSV export
+- [x] 54 tests across 6 suites
 - [ ] Codex session support
 - [ ] Git integration (map sessions → commits → PRs)
-- [ ] CSV export
 - [ ] Custom classifiers
 - [ ] Team dashboard (web UI)
 - [ ] Historical trend charts
