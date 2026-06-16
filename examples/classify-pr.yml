@@ -1,0 +1,26 @@
+# Example: Add AgentCensus PR classification to your repo
+#
+# Copy this file to .github/workflows/classify-pr.yml in your repository.
+# Every PR will get an automatic classification comment showing what
+# was built — features, bugfixes, tests, refactors, docs, and CI changes.
+
+name: 'Classify PR'
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Classify PR outcomes
+        uses: varunrau/agent-census@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment: 'true'
+          summary: 'true'
