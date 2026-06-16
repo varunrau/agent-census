@@ -104,6 +104,72 @@ agent-census --agent claude --days 7
 | `--csv` | | CSV export (opens in Excel/Sheets) |
 | `--no-color` | | Disable terminal colors |
 
+## GitHub Action — PR Classification
+
+AgentCensus also ships as a **GitHub Action** that automatically classifies what each PR built. Add it to any repo:
+
+```yaml
+# .github/workflows/classify-pr.yml
+name: Classify PR
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Classify PR outcomes
+        uses: varunrau/agent-census@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+Every PR gets an automatic classification comment:
+
+> 📊 **AgentCensus — PR Classification**
+>
+> This PR is primarily a **🚀 Feature** change.
+>
+> | Files | Added | Modified | Removed | Lines |
+> |:-----:|:-----:|:--------:|:-------:|:-----:|
+> | 8 | +5 | ~2 | -1 | +247 net |
+>
+> | Category | Files | |
+> |:---------|------:|:-|
+> | 🚀 Feature | 4 | ████████ 50% |
+> | 🧪 Tests | 2 | ████ 25% |
+> | 📝 Documentation | 1 | ██ 12% |
+> | 🔧 CI/CD | 1 | ██ 12% |
+
+### Action Inputs
+
+| Input | Default | Description |
+|-------|---------|-------------|
+| `github-token` | `${{ github.token }}` | GitHub token for API access |
+| `comment` | `true` | Post classification as a PR comment |
+| `summary` | `true` | Add to GitHub Actions job summary |
+
+### Action Outputs
+
+| Output | Description |
+|--------|-------------|
+| `classification` | Full JSON classification result |
+| `primary-tag` | Dominant outcome tag (feature, bugfix, test, etc.) |
+| `files-changed` | Total files changed |
+
+Use outputs in downstream steps:
+
+```yaml
+- uses: varunrau/agent-census@main
+  id: census
+- run: echo "This PR is a ${{ steps.census.outputs.primary-tag }} change"
+```
+
 ## Supported Agents
 
 | Agent | Status | Data Source |
@@ -174,27 +240,29 @@ npm start
 ### Testing
 
 ```bash
-# Run all 54 tests
+# Run all 80 tests
 npm test
 ```
 
-Tests cover cost calculation (14 tests), outcome classification (13 tests), and report formatting/CSV/JSON (27 tests). Uses Node.js built-in test runner — no extra dependencies.
+Tests cover cost calculation (14 tests), outcome classification (13 tests), report formatting/CSV/JSON (27 tests), and PR classification (26 tests). Uses Node.js built-in test runner — no extra dependencies.
 
 ### Project Structure
 
 ```
 src/
-├── index.ts       # CLI entry point
-├── types.ts       # Type definitions
-├── scanner.ts     # Session log discovery and parsing
-├── costs.ts       # Token cost calculation
-├── outcomes.ts    # Outcome classification (the differentiator)
-└── report.ts      # Terminal and JSON formatters
+├── index.ts         # CLI entry point
+├── types.ts         # Type definitions
+├── scanner.ts       # Session log discovery and parsing
+├── costs.ts         # Token cost calculation
+├── outcomes.ts      # Outcome classification (the differentiator)
+├── report.ts        # Terminal and JSON formatters
+└── pr-analyzer.ts   # GitHub Action — PR classification engine
 
 tests/
-├── costs.test.ts     # 14 tests — model-specific pricing
-├── outcomes.test.ts  # 13 tests — classification engine
-└── report.test.ts    # 27 tests — formatting, CSV, JSON
+├── costs.test.ts        # 14 tests — model-specific pricing
+├── outcomes.test.ts     # 13 tests — classification engine
+├── report.test.ts       # 27 tests — formatting, CSV, JSON
+└── pr-analyzer.test.ts  # 26 tests — PR file classification
 ```
 
 ## Roadmap
@@ -205,7 +273,8 @@ tests/
 - [x] Terminal reports with color
 - [x] JSON output
 - [x] CSV export
-- [x] 54 tests across 6 suites
+- [x] 80 tests across 8 suites
+- [x] GitHub Action — PR outcome classification
 - [ ] Codex session support
 - [ ] Git integration (map sessions → commits → PRs)
 - [ ] Custom classifiers
