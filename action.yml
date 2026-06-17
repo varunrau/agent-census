@@ -1,0 +1,58 @@
+name: 'AgentCensus PR Classifier'
+description: >
+  📊 Classify what a PR actually built — features, bugfixes, tests, refactors, docs, CI.
+  The only GitHub Action that tracks outcomes, not just diffs.
+author: 'Varun Rau <varunrau@gmail.com>'
+
+branding:
+  icon: 'bar-chart-2'
+  color: 'blue'
+
+inputs:
+  github-token:
+    description: 'GitHub token for API access and PR comments'
+    required: false
+    default: ${{ github.token }}
+  comment:
+    description: 'Post classification as a PR comment (true/false)'
+    required: false
+    default: 'true'
+  summary:
+    description: 'Add classification to GitHub Actions job summary (true/false)'
+    required: false
+    default: 'true'
+
+outputs:
+  classification:
+    description: 'JSON object with the full classification result'
+    value: ${{ steps.classify.outputs.classification }}
+  primary-tag:
+    description: 'The dominant outcome tag (feature, bugfix, test, etc.)'
+    value: ${{ steps.classify.outputs.primary_tag }}
+  files-changed:
+    description: 'Total number of files changed'
+    value: ${{ steps.classify.outputs.files_changed }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      shell: bash
+      run: cd ${{ github.action_path }} && npm install --ignore-scripts 2>/dev/null || true
+
+    - name: Classify PR outcomes
+      id: classify
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        INPUT_COMMENT: ${{ inputs.comment }}
+        INPUT_SUMMARY: ${{ inputs.summary }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        REPO_OWNER: ${{ github.repository_owner }}
+        REPO_NAME: ${{ github.event.repository.name }}
+      run: npx tsx ${{ github.action_path }}/src/pr-analyzer.ts

@@ -1,0 +1,26 @@
+# Dogfood: Run AgentCensus on its own PRs
+name: Classify PR
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Classify PR outcomes
+        id: census
+        uses: ./
+        with:
+          comment: 'true'
+          summary: 'true'
+
+      - name: Show primary tag
+        run: echo "This PR is primarily a ${{ steps.census.outputs.primary-tag }} change"
